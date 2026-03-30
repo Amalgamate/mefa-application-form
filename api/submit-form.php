@@ -5,6 +5,7 @@ ini_set('log_errors', '1');
 
 // Start output buffering so we can recover from fatal errors and return JSON
 ob_start();
+$rootPath = dirname(__DIR__);
 
 // Fatal error handler to convert white-screen/HTML 500 into JSON
 register_shutdown_function(function () {
@@ -34,10 +35,10 @@ if (file_exists($composerAutoload)) {
 } else {
     // Common manual locations: phpmailer/src or any PHPMailer*/src in current directory
     $candidateDirs = [];
-    $candidateDirs[] = __DIR__ . '/phpmailer/src/';
-    $candidateDirs[] = __DIR__ . '/PHPMailer/src/';
-    foreach (glob(__DIR__ . '/PHPMailer*/src/', GLOB_NOSORT) as $g) { $candidateDirs[] = $g; }
-    foreach (glob(__DIR__ . '/phpmailer*/src/', GLOB_NOSORT) as $g) { $candidateDirs[] = $g; }
+    $candidateDirs[] = dirname(__DIR__) . '/phpmailer/src/';
+    $candidateDirs[] = dirname(__DIR__) . '/PHPMailer/src/';
+    foreach (glob(dirname(__DIR__) . '/PHPMailer*/src/', GLOB_NOSORT) as $g) { $candidateDirs[] = $g; }
+    foreach (glob(dirname(__DIR__) . '/phpmailer*/src/', GLOB_NOSORT) as $g) { $candidateDirs[] = $g; }
 
     foreach ($candidateDirs as $phpMailerBase) {
         if (is_file($phpMailerBase . 'PHPMailer.php')) {
@@ -106,11 +107,11 @@ $config = [
     ],
     // Logging
     'debug' => true,
-    'log_file' => (getenv('VERCEL') ? sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'uploads' : __DIR__ . DIRECTORY_SEPARATOR . 'uploads') . DIRECTORY_SEPARATOR . 'mail.log',
+    'log_file' => (getenv('VERCEL') ? sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'uploads' : dirname(__DIR__) . DIRECTORY_SEPARATOR . 'uploads') . DIRECTORY_SEPARATOR . 'mail.log',
 ];
 
 // Optional local override without committing secrets: create public/config.mail.php
-$overridePath = __DIR__ . DIRECTORY_SEPARATOR . 'config.mail.php';
+$overridePath = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'config.mail.php';
 if (file_exists($overridePath)) {
     $override = include $overridePath;
     if (is_array($override)) {

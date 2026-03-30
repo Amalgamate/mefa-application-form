@@ -1,13 +1,13 @@
 {
   "functions": {
-    "submit-form.php": {
+    "api/submit-form.php": {
       "runtime": "vercel-php@0.7.0"
     }
   },
   "routes": [
     {
       "src": "/submit-form.php",
-      "dest": "/submit-form.php"
+      "dest": "/api/submit-form.php"
     },
     {
       "src": "/(.*)",
