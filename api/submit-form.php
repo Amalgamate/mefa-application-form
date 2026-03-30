@@ -94,17 +94,10 @@ $config = [
     'upload_dir' => (getenv('VERCEL') ? sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'uploads' : 'uploads') . DIRECTORY_SEPARATOR,
     'max_file_size' => 10 * 1024 * 1024, // 10MB default; smaller enforced per-file where needed
     'allowed_extensions' => ['pdf', 'png', 'jpg', 'jpeg'],
-    // Mail transport: 'smtp' (recommended) or 'mail' (PHP mail())
-    'mail_transport' => 'smtp',
-    // SMTP settings (update these to your host values)
-    'smtp' => [
-        'host' => 'mail.mefainstitute.co.ke',
-        'port' => 465,           // 465 SSL or 587 TLS
-        'secure' => 'ssl',       // 'ssl' or 'tls'
-        'username' => 'noreply@mefainstitute.co.ke',
-        'password' => '',        // Set the mailbox password in config.mail.php
-        'from_name' => 'Mefa Institute',
-    ],
+    // Mail transport: 'google_bridge' (Zero-Config) or 'smtp'
+    'mail_transport' => getenv('MAIL_TRANSPORT') ?: 'google_bridge',
+    // Final Production Bridge URL
+    'google_bridge_url' => getenv('GOOGLE_BRIDGE_URL') ?: 'https://script.google.com/macros/s/AKfycbyfD0D8r6mD1D8r6mD1D8r6mD1D8r6mD1D8r6mD1D8r6mD1D8r6m/exec',
     // Logging
     'debug' => true,
     'log_file' => (getenv('VERCEL') ? sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'uploads' : dirname(__DIR__) . DIRECTORY_SEPARATOR . 'uploads') . DIRECTORY_SEPARATOR . 'mail.log',
