@@ -96,8 +96,8 @@ $config = [
     'allowed_extensions' => ['pdf', 'png', 'jpg', 'jpeg'],
     // Mail transport: 'google_bridge' (Zero-Config) or 'smtp'
     'mail_transport' => getenv('MAIL_TRANSPORT') ?: 'google_bridge',
-    // Final Production Bridge URL (Mefa Creations)
-    'google_bridge_url' => getenv('GOOGLE_BRIDGE_URL') ?: 'https://script.google.com/macros/s/AKfycbxMgxiWvISVPpeVQ9ZyDKRnf5nCEMAMj6msl4_Oz61eHgPGhUHbOTWvFzICReyYwKw/exec',
+    // Final Production Bridge URL (Mefa Creations - Plus Trick Edition)
+    'google_bridge_url' => getenv('GOOGLE_BRIDGE_URL') ?: 'https://script.google.com/macros/s/AKfycbz6psbgnah5T3WHdV09zAj4cX_24QmwA3knxdjDt0No_aBtOcy51t4x9lKqqZ62LPI/exec',
     // Logging
     'debug' => true,
     'log_file' => (getenv('VERCEL') ? sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'uploads' : dirname(__DIR__) . DIRECTORY_SEPARATOR . 'uploads') . DIRECTORY_SEPARATOR . 'mail.log',
