@@ -94,11 +94,23 @@
         }
 
         // --- 2. THE DOUBLE-TURBO INTERCEPTOR (Catch BOTH Fetch and XHR) ---
+        function handleResponse(text) {
+          document.getElementById('mefa-spinner').style.display = 'none';
+          if (text && (text.toLowerCase().includes('success') || text.toLowerCase().includes('successfully'))) {
+            document.getElementById('modal-icon').innerText = "✅";
+            document.getElementById('modal-title').innerText = "Successful!";
+            document.getElementById('whatsapp-container').style.display = 'block';
+            document.getElementById('mefa-modal').style.display = 'flex';
+          }
+        }
+
         // Catch Fetch
         const originalFetch = window.fetch;
         window.fetch = async function(...args) {
           const [resource, config] = args;
-          if (config && config.body instanceof FormData) {
+          let isSubmit = resource && resource.includes('submit-form.php');
+          
+          if (isSubmit && config && config.body instanceof FormData) {
             document.getElementById('mefa-spinner').style.display = 'flex';
             const newFd = new FormData();
             for (let [key, value] of config.body.entries()) {
@@ -108,13 +120,28 @@
             }
             config.body = newFd;
           }
-          return originalFetch.apply(this, args);
+          
+          try {
+            const response = await originalFetch.apply(this, args);
+            if (isSubmit) {
+              const clone = response.clone();
+              const text = await clone.text();
+              handleResponse(text);
+            }
+            return response;
+          } catch (e) {
+            document.getElementById('mefa-spinner').style.display = 'none';
+            throw e;
+          }
         };
 
         // Catch XMLHttpRequest (Old school)
         const originalSend = XMLHttpRequest.prototype.send;
         XMLHttpRequest.prototype.send = async function(body) {
-          if (body instanceof FormData) {
+          const isSubmit = this._url && this._url.includes('submit-form.php');
+          let finalBody = body;
+
+          if (isSubmit && body instanceof FormData) {
             document.getElementById('mefa-spinner').style.display = 'flex';
             const newFd = new FormData();
             for (let [key, value] of body.entries()) {
@@ -122,9 +149,19 @@
                 newFd.append(key, await compressImage(value));
               } else { newFd.append(key, value); }
             }
-            return originalSend.call(this, newFd);
+            finalBody = newFd;
           }
-          return originalSend.call(this, body);
+          
+          this.addEventListener('load', () => { handleResponse(this.responseText); });
+          this.addEventListener('error', () => { document.getElementById('mefa-spinner').style.display = 'none'; });
+          this.addEventListener('abort', () => { document.getElementById('mefa-spinner').style.display = 'none'; });
+          
+          return originalSend.call(this, finalBody);
+        };
+        const originalOpen = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function(method, url) {
+          this._url = url;
+          return originalOpen.apply(this, arguments);
         };
 
         // --- 3. THE PREMIUM MODALS ---
