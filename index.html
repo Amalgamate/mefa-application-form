@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="./MEFA-Institute-of-Design.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mefa Institute - Application Form</title>
+    <meta name="description" content="Apply to Mefa Institute's fashion design programs" />
+    <script type="module" crossorigin src="./assets/index-jQJeXj1y.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BsLlxkBH.css">
+  </head>
+  <body>
+    <!-- Netlify Forms Detection -->
+    <form name="mefa-course-application" netlify netlify-honeypot="bot-field" hidden>
+      <input type="text" name="fullName" />
+      <input type="text" name="gender" />
+      <input type="date" name="dateOfBirth" />
+      <input type="text" name="town" />
+      <input type="text" name="country" />
+      <textarea name="physicalAddress"></textarea>
+      <input type="tel" name="telephone" />
+      <input type="email" name="email" />
+      <input type="text" name="nextOfKinName" />
+      <input type="tel" name="nextOfKinPhone" />
+      <input type="text" name="courses" />
+      <input type="date" name="enrollmentDate" />
+      <input type="file" name="academicCertificates" />
+      <input type="text" name="educationLevel" />
+      <input type="checkbox" name="declaration" />
+    </form>
+    
+    <div id="root"></div>
+
+    <!-- UI ENHANCEMENT: SPINNER & MODAL -->
+    <style>
+      #mefa-spinner { display:none; position:fixed; top:0; left:0; width:100%; height:100vh; background:rgba(255,255,255,0.95); z-index:9999; flex-direction:column; align-items:center; justify-content:center; backdrop-filter: blur(4px); }
+      .spinner-ring { border:8px dotted #f3f3f3; border-top:8px solid #27ae60; border-radius:50%; width:80px; height:80px; animation: spin 1200ms linear infinite; }
+      #mefa-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10000; align-items:center; justify-content:center; padding:20px; box-sizing:border-box; }
+      .modal-card { background:white; padding:45px 30px; border-radius:30px; max-width:460px; width:100%; text-align:center; box-shadow:0 35px 95px rgba(0,0,0,0.5); animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position:relative; }
+      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+      @keyframes pop { 0% { transform: scale(0.8); opacity:0; } 100% { transform: scale(1); opacity:1; } }
+      .mefa-btn { display:inline-block; margin-top:30px; padding:18px 40px; background:#27ae60; color:white !important; text-decoration:none; border-radius:60px; font-weight:900; font-family: sans-serif; transition: 0.35s; box-shadow:0 12px 25px rgba(39,174,96,0.35); font-size:16px; min-width: 250px; text-transform: uppercase; letter-spacing: 1px; }
+      .mefa-btn:hover { background:#219150; transform: translateY(-4px); box-shadow:0 20px 40px rgba(39,174,96,0.5); }
+      
+      /* AGGRESSIVE SIDE BUTTON REMOVAL */
+      [class*="fixed"][class*="right-"], [style*="position: fixed"][style*="right:"], div[style*="z-index: 50"] { display: none !important; opacity: 0 !important; pointer-events: none !important; }
+      #root + div, #root ~ div:not(#mefa-spinner):not(#mefa-modal) { display: none !important; }
+    </style>
+
+    <div id="mefa-spinner">
+      <div class="spinner-ring"></div>
+      <p id="spinner-text" style="font-family: sans-serif; margin-top:25px; font-weight:900; color:#27ae60; letter-spacing:3px; font-size:11px; text-transform:uppercase;">PROCESSING APPLICATION...</p>
+    </div>
+
+    <div id="mefa-modal">
+      <div class="modal-card">
+        <div id="modal-icon" style="font-size:75px; margin-bottom:20px;">✅</div>
+        <h2 id="modal-title" style="margin:0; font-family:sans-serif; color:#111; font-weight:900; font-size:32px;">Success!</h2>
+        <p id="modal-msg" style="margin:25px 0; color:#444; font-family:sans-serif; line-height:1.7; font-size:18px;"></p>
+        <div id="whatsapp-container" style="display:none; border-top: 3px solid #fcfcfc; margin-top:30px; padding-top:25px;">
+           <p style="font-family:sans-serif; font-size:14px; color:#999; margin-bottom:20px; text-transform:uppercase; letter-spacing:1.5px; font-weight:800;">Next Step:</p>
+           <a href="https://chat.whatsapp.com/HctkRqSgSvY2XYsf5KWdDk?mode=gi_t" target="_blank" class="mefa-btn">Join WhatsApp Community</a>
+        </div>
+        <button onclick="document.getElementById('mefa-modal').style.display='none'" style="margin-top:40px; background:none; border:none; color:#ddd; cursor:pointer; text-decoration:none; font-size:12px; text-transform:uppercase; letter-spacing:2px; font-weight:900;">Dismiss</button>
+      </div>
+    </div>
+
+    <script>
+      (function() {
+        // --- 1. THE TURBO COMPRESSOR ---
+        async function compressImage(file) {
+          if (!file.type.startsWith('image/')) return file;
+          return new Promise(resolve => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = e => {
+              const img = new Image();
+              img.src = e.target.result;
+              img.onload = () => {
+                const max = 1200; // Even faster resolution for mobile users
+                let w = img.width, h = img.height;
+                if (w > h && w > max) { h *= max/w; w = max; }
+                else if (h > max) { w *= max/h; h = max; }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                canvas.toBlob(blob => {
+                  resolve(new File([blob], file.name, {type: 'image/jpeg'}));
+                }, 'image/jpeg', 0.7); // 70% Quality for Ultra Speed
+              };
+            };
+          });
+        }
+
+        // --- 2. THE DOUBLE-TURBO INTERCEPTOR (Catch BOTH Fetch and XHR) ---
+        // Catch Fetch
+        const originalFetch = window.fetch;
+        window.fetch = async function(...args) {
+          const [resource, config] = args;
+          if (config && config.body instanceof FormData) {
+            document.getElementById('mefa-spinner').style.display = 'flex';
+            const newFd = new FormData();
+            for (let [key, value] of config.body.entries()) {
+              if (value instanceof File && value.type.startsWith('image/')) {
+                newFd.append(key, await compressImage(value));
+              } else { newFd.append(key, value); }
+            }
+            config.body = newFd;
+          }
+          return originalFetch.apply(this, args);
+        };
+
+        // Catch XMLHttpRequest (Old school)
+        const originalSend = XMLHttpRequest.prototype.send;
+        XMLHttpRequest.prototype.send = async function(body) {
+          if (body instanceof FormData) {
+            document.getElementById('mefa-spinner').style.display = 'flex';
+            const newFd = new FormData();
+            for (let [key, value] of body.entries()) {
+              if (value instanceof File && value.type.startsWith('image/')) {
+                newFd.append(key, await compressImage(value));
+              } else { newFd.append(key, value); }
+            }
+            return originalSend.call(this, newFd);
+          }
+          return originalSend.call(this, body);
+        };
+
+        // --- 3. THE PREMIUM MODALS ---
+        window.alert = function(msg) {
+          document.getElementById('mefa-spinner').style.display = 'none';
+          document.getElementById('modal-msg').innerText = msg;
+          document.getElementById('mefa-modal').style.display = 'flex';
+          const isSuccess = msg.toLowerCase().includes('successfully') || msg.toLowerCase().includes('success');
+          if (isSuccess) {
+            document.getElementById('modal-icon').innerText = "✅";
+            document.getElementById('modal-title').innerText = "Successful!";
+            document.getElementById('whatsapp-container').style.display = 'block';
+          } else {
+            document.getElementById('modal-icon').innerText = "⚠️";
+            document.getElementById('modal-title').innerText = "Registration Status";
+            document.getElementById('whatsapp-container').style.display = 'none';
+          }
+        };
+      })();
+    </script>
+  </body>
+</html>

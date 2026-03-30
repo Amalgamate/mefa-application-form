@@ -1,0 +1,6 @@
+uploads/
+vendor/
+.env
+php.ini
+.DS_Store
+config.mail.php
