@@ -455,9 +455,7 @@ function sendEmail($formData, $attachmentPath, $config, $idCopyPath = null, $pas
 // Main processing
 try {
     set_time_limit(120); // Allow up to 2 minutes for processing large uploads
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        throw new Exception('Only POST method allowed');
-    }
+        log_debug('Received POST request with files: ' . implode(', ', array_keys($_FILES)), $config);
     
     // Gather form data – support both old (React) and previous simple form field names
     $formData = [];
@@ -578,18 +576,22 @@ try {
     if (isset($_FILES['academicCertificates']) && $_FILES['academicCertificates']['error'] !== UPLOAD_ERR_NO_FILE) {
         $config['max_file_size'] = 10 * 1024 * 1024; // 10MB
         $attachmentPath = handleFileUpload($_FILES['academicCertificates'], $config);
+        log_debug('Saved academicCertificates attachment: ' . $attachmentPath, $config);
     }
     if (!$attachmentPath && isset($_FILES['certificate']) && $_FILES['certificate']['error'] !== UPLOAD_ERR_NO_FILE) {
         $config['max_file_size'] = 10 * 1024 * 1024; // 10MB
         $attachmentPath = handleFileUpload($_FILES['certificate'], $config);
+        log_debug('Saved certificate attachment: ' . $attachmentPath, $config);
     }
     if (isset($_FILES['id_copy']) && $_FILES['id_copy']['error'] !== UPLOAD_ERR_NO_FILE) {
         $config['max_file_size'] = 10 * 1024 * 1024; // 10MB
         $idCopyPath = handleFileUpload($_FILES['id_copy'], $config);
+        log_debug('Saved id_copy attachment: ' . $idCopyPath, $config);
     }
     if (isset($_FILES['passport_photo']) && $_FILES['passport_photo']['error'] !== UPLOAD_ERR_NO_FILE) {
         $config['max_file_size'] = 2 * 1024 * 1024; // 2MB for photo
         $passportPhotoPath = handleFileUpload($_FILES['passport_photo'], $config);
+        log_debug('Saved passport_photo attachment: ' . $passportPhotoPath, $config);
     }
     $config['max_file_size'] = $saveMax;
     if (!$attachmentPath) {
