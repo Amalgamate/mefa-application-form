@@ -259,11 +259,11 @@ function sendEmail($formData, $attachmentPath, $config, $idCopyPath = null, $pas
         
         // Add files as JSON in the post body (script expects them there)
         $jsonPayload = json_encode(['files' => $filesData]);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array_merge($postData, ['json_payload' => $jsonPayload])));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array_merge($postData, ['json_payload' => $jsonPayload, 'files_json' => $jsonPayload])));
 
         // Re-read script: script expects files in e.postData.contents if JSON, 
-        // but easier to send as a parameter for simplicity in this specific script version
-        $finalPayload = array_merge($postData, ['files_json' => $jsonPayload]);
+        // but easier to send both payload names for compatibility with different script versions
+        $finalPayload = array_merge($postData, ['files_json' => $jsonPayload, 'json_payload' => $jsonPayload]);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($finalPayload));
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Bypass SSL verification for local testing
         curl_setopt($ch, CURLOPT_TIMEOUT, 120); // Increase timeout to 2 minutes
@@ -360,6 +360,7 @@ function sendEmail($formData, $attachmentPath, $config, $idCopyPath = null, $pas
             
             <p><strong>Course Details:</strong><br>
             Selected: " . strip_tags($formData['courses'] ?? '') . "<br>
+            Grade: " . strtoupper($formData['grade'] ?? '') . "<br>
             Intake: " . $formData['enrollmentDate'] . "</p>
             
             <p><strong>Education:</strong><br>
@@ -375,6 +376,7 @@ function sendEmail($formData, $attachmentPath, $config, $idCopyPath = null, $pas
     $messageBody .= "Email: " . $formData['email'] . "\n";
     $messageBody .= "Phone: " . $formData['telephone'] . "\n\n";
     $messageBody .= "Course: " . strip_tags($formData['courses'] ?? '') . "\n";
+    $messageBody .= "Grade: " . strtoupper($formData['grade'] ?? '') . "\n";
     $messageBody .= "Enrollment: " . $formData['enrollmentDate'] . "\n";
     $messageBody .= "Education: " . $formData['educationLevel'] . "\n";
     $messageBody .= "\nSubmitted on: " . date('Y-m-d H:i:s');
@@ -483,6 +485,7 @@ try {
         $formData['nextOfKinPhone'] = sanitizeInput($_POST['kin_phone'] ?? '');
         $formData['nextOfKinEmail'] = sanitizeInput($_POST['kin_email'] ?? '');
         $formData['enrollmentDate'] = sanitizeInput($_POST['preferred_intake'] ?? ($_POST['enrollmentDate'] ?? ''));
+        $formData['grade'] = sanitizeInput($_POST['grade'] ?? '');
         $formData['educationLevel'] = sanitizeInput($_POST['study_mode'] ?? ($_POST['educationLevel'] ?? ''));
 
         $courseValue = $_POST['course'] ?? null;
@@ -500,7 +503,7 @@ try {
         $requiredFields = [
             'fullName', 'gender', 'dateOfBirth', 'town', 'country', 
             'physicalAddress', 'telephone', 'email', 'nextOfKinName', 
-            'nextOfKinPhone', 'enrollmentDate', 'educationLevel'
+            'nextOfKinPhone', 'enrollmentDate', 'grade', 'educationLevel'
         ];
         foreach ($requiredFields as $field) {
             if (!isset($_POST[$field]) || empty(trim($_POST[$field]))) {
@@ -508,6 +511,7 @@ try {
             }
             $formData[$field] = sanitizeInput($_POST[$field]);
         }
+        $formData['grade'] = sanitizeInput($_POST['grade'] ?? '');
         // Process courses array
         if (!isset($_POST['courses']) || empty($_POST['courses'])) {
             throw new Exception('At least one course must be selected');
