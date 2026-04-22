@@ -46,6 +46,37 @@
       /* AGGRESSIVE SIDE BUTTON REMOVAL */
       [class*="fixed"][class*="right-"], [style*="position: fixed"][style*="right:"], div[style*="z-index: 50"] { display: none !important; opacity: 0 !important; pointer-events: none !important; }
       #root + div, #root ~ div:not(#mefa-spinner):not(#mefa-modal) { display: none !important; }
+
+      /* BACK HOME BUTTON STYLES */
+      #root { padding-top: 80px; }
+      .mefa-back-home {
+        position: absolute;
+        top: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: white;
+        padding: 10px 20px;
+        border-radius: 50px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        text-decoration: none !important;
+        color: #27ae60 !important;
+        font-family: sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        z-index: 1000;
+        border: 1px solid #f0f0f0;
+      }
+      .mefa-back-home:hover {
+        transform: translateX(-50%) translateY(-3px);
+        box-shadow: 0 15px 35px rgba(39,174,96,0.15);
+        background: #f8fffb;
+      }
+      .mefa-back-home svg { width: 18px; height: 18px; transition: transform 0.3s; }
+      .mefa-back-home:hover svg { transform: translateX(-3px); }
     </style>
 
     <div id="mefa-spinner">
@@ -181,6 +212,27 @@
             document.getElementById('whatsapp-container').style.display = 'none';
           }
         };
+      })();
+
+      // --- 5. THE BACK-HOME RELOCATOR ---
+      (function() {
+        function relocateBackHome() {
+          const links = document.querySelectorAll('a');
+          let backLink = null;
+          for (let a of links) {
+            if (a.innerText && a.innerText.toLowerCase().includes('back to home')) {
+              backLink = a; break;
+            }
+          }
+
+          if (backLink && !backLink.dataset.relocated) {
+             backLink.dataset.relocated = "true";
+             backLink.className = 'mefa-back-home';
+             backLink.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg> Back home`;
+             document.body.prepend(backLink);
+          }
+        }
+        setInterval(relocateBackHome, 300);
       })();
     </script>
   </body>

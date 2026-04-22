@@ -594,9 +594,7 @@ try {
         log_debug('Saved passport_photo attachment: ' . $passportPhotoPath, $config);
     }
     $config['max_file_size'] = $saveMax;
-    if (!$attachmentPath) {
-        throw new Exception('Academic certificate is required');
-    }
+    /* Academic certificate is now optional */
     
     // Send email (include optional attachments)
     sendEmail($formData, $attachmentPath, $config, $idCopyPath, $passportPhotoPath);
