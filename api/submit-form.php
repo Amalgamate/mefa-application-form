@@ -465,9 +465,22 @@ try {
     $lastName = $_POST['lastName'] ?? null;
     $middleName = $_POST['middleName'] ?? '';
     if ($firstName && $lastName) {
+        // Enforce emptiness check for mandatory fields
+        if (empty(trim($firstName))) throw new Exception('First Name is required');
+        if (empty(trim($lastName))) throw new Exception('Last Name is required');
+        
+        $telephone = $_POST['telephone'] ?? null;
+        if (empty(trim($telephone))) throw new Exception('Telephone Number is required');
+        
+        $dob = $_POST['dob'] ?? null;
+        if (empty(trim($dob))) throw new Exception('Date of Birth is required');
+        
+        $gender = $_POST['gender'] ?? null;
+        if (empty(trim($gender))) throw new Exception('Gender is required');
+
         $formData['fullName'] = sanitizeInput(trim($firstName . ' ' . ($middleName ? $middleName . ' ' : '') . $lastName));
-        $formData['gender'] = sanitizeInput($_POST['gender'] ?? '');
-        $formData['dateOfBirth'] = sanitizeInput($_POST['dob'] ?? '');
+        $formData['gender'] = sanitizeInput($gender);
+        $formData['dateOfBirth'] = sanitizeInput($dob);
         $formData['town'] = sanitizeInput($_POST['town'] ?? '');
         $formData['country'] = sanitizeInput($_POST['country'] ?? '');
         $formData['physicalAddress'] = sanitizeInput($_POST['address'] ?? ($_POST['physicalAddress'] ?? ''));
@@ -477,7 +490,7 @@ try {
         if ($postalAddress || $postalCode) {
             $formData['physicalAddress'] .= ($formData['physicalAddress'] ? "\n" : '') . 'Postal: ' . trim($postalAddress . ' ' . $postalCode);
         }
-        $formData['telephone'] = sanitizeInput($_POST['telephone'] ?? '');
+        $formData['telephone'] = sanitizeInput($telephone);
         $formData['email'] = sanitizeInput($_POST['email'] ?? '');
         $formData['nextOfKinName'] = sanitizeInput($_POST['kin_name'] ?? '');
         $formData['nextOfKinPhone'] = sanitizeInput($_POST['kin_phone'] ?? '');
